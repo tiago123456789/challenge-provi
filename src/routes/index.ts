@@ -7,7 +7,8 @@ import PointRepository from "../repositories/PointRepository";
 import PointService from "../service/PointService";
 
 const pointRepository = new PointRepository();
-const itemEndpoint = new ItemEndpoint(new ItemRepository());
+const itemRepository = new ItemRepository();
+const itemEndpoint = new ItemEndpoint(itemRepository);
 const pointEndpoint = new PointEndpoint(
     pointRepository, new PointService(pointRepository)
 );

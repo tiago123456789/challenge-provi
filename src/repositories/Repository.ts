@@ -1,12 +1,13 @@
-import bootstrap from "../config/Bootstrap";
+import Knex from "knex";
+import connection from "./../config/Database";
 
 abstract class Repository {
 
-    private connection: any;
+    private connection: Knex;
     protected table: string; 
 
     constructor(table: string) {
-        this.connection = bootstrap.getConfigLoaded("database");
+        this.connection = connection;
         this.table = table;
     }
 

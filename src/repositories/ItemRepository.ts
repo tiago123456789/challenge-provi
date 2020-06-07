@@ -6,6 +6,6 @@ class ItemRepository extends Repository implements ItemRepositoryInterface {
     constructor() {
         super("itens");
     }
-};
+}
 
 export default ItemRepository;

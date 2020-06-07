@@ -9,7 +9,8 @@ class PointService {
 
     async findById(id: number) {
         const point = await this.repository.findById(id);
-        if (!point) {
+        const isNull = point.length == 0;
+        if (isNull) {
             throw new NotFoundException("Point not found!");
         }
         return point;

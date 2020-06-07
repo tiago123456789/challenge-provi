@@ -1,6 +1,9 @@
-import ApplicationBootstrap from "./config/Bootstrap"
-console.log(ApplicationBootstrap);
-ApplicationBootstrap.bootstrap();
+
+import app from "./config/Server";
+
+app.listen(process.env.PORT, (): void => {
+    console.log("Server running in address: http://localhost:3000");
+});
 
 
 
