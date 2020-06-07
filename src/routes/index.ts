@@ -5,10 +5,11 @@ import ItemRepository from "../repositories/ItemRepository";
 import handlerExceptionMiddleware from "../middleware/HandlerExceptionMiddleware";
 import PointRepository from "../repositories/PointRepository";
 import PointService from "../service/PointService";
+import ItemSerializator from "../serialization/ItemSerializator";
 
 const pointRepository = new PointRepository();
 const itemRepository = new ItemRepository();
-const itemEndpoint = new ItemEndpoint(itemRepository);
+const itemEndpoint = new ItemEndpoint(new ItemSerializator(), itemRepository);
 const pointEndpoint = new PointEndpoint(
     pointRepository, new PointService(pointRepository)
 );

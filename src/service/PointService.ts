@@ -15,6 +15,11 @@ class PointService {
         }
         return point;
     }
+
+    async create(newRegister: { [key: string]: any}) {
+        return this.repository.create(newRegister);
+    }
+
 }
 
 export default PointService;

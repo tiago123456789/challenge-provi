@@ -1,10 +1,10 @@
-import Knex from "knex";
+import Knex, { Transaction } from "knex";
 import connection from "./../config/Database";
 
 abstract class Repository {
 
     private connection: Knex;
-    protected table: string; 
+    protected table: string;
 
     constructor(table: string) {
         this.connection = connection;
@@ -20,21 +20,23 @@ abstract class Repository {
 
     public findById(id: number) {
         return this.connection(this.table)
-                   .where({ id: id })
-                   .select("*");
+            .where({ id: id })
+            .select("*");
     }
 
     public remove(id: number) {
         return this.connection(this.table)
-                   .where({ id: id })
-                   .delete();
+            .where({ id: id })
+            .delete();
     }
 
-    public create(newRegister: { [key: string]: any } ) {
-        return this.connection(this.table).insert(newRegister);
+    public create(newRegister: { [key: string]: any }): Promise<any> {
+        return this.connection(this.table)
+            .returning('id')
+            .insert(newRegister);
     }
 
-    public update(id: number, datasModified: { [key: string]: any } ) {
+    public update(id: number, datasModified: { [key: string]: any }) {
         return this.connection(this.table).where({ id: id }).update(datasModified);
     }
 

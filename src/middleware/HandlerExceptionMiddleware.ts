@@ -8,6 +8,11 @@ export default (error: Error, request: Request, response: Response, next: NextFu
                 statusCode: 404,
                 message: error.message
             });
+        case "InvalidDatasException":
+            return response.status(400).json({
+                statusCode: 400,
+                message: JSON.parse(error.message)
+            });
         default: 
             return response.status(500).json({
                 statusCode: 500,
