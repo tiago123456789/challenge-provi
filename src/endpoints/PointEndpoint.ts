@@ -33,7 +33,18 @@ class PointEndpoint extends Endpoint {
     }
 
     async findAll(request: Request, response: Response) {
-        const itens = await this.repository.findAll(["*"], {});
+        let { city, uf } = request.query;
+        const conditionsQuery: { [key: string]: any } = {};
+        
+        if (city) {
+            conditionsQuery["city"] = city;
+        }
+
+        if (uf) {
+            conditionsQuery["uf"] = uf;
+        }
+
+        const itens = await this.repository.findAll(["*"], conditionsQuery);
         return response.json(itens);
     }
 
