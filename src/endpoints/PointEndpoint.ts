@@ -3,14 +3,17 @@ import Joi from "@hapi/joi";
 import PointRepositoryInterface from "../repositories/contracts/PointRepositoryInterface";
 import PointService from "../service/PointService";
 import Endpoint from "./Endpoint";
+import Serializator from "../serialization/Serializator";
 
 class PointEndpoint extends Endpoint {
     
     constructor(
         private readonly repository: PointRepositoryInterface,
-        private readonly service: PointService
+        private readonly service: PointService,
+        private readonly serializador: Serializator
     ) {
         super();
+        this.serializador = serializador;
         this.repository = repository;
         this.service = this.service;
         this.create = this.create.bind(this);
@@ -44,7 +47,8 @@ class PointEndpoint extends Endpoint {
             conditionsQuery["uf"] = uf;
         }
 
-        const itens = await this.repository.findAll(["*"], conditionsQuery);
+        let itens = await this.repository.findAll(["*"], conditionsQuery);
+        itens = this.serializador.serialize(itens);
         return response.json(itens);
     }
 
@@ -62,6 +66,7 @@ class PointEndpoint extends Endpoint {
     async create(request: Request, response: Response, next: NextFunction) {
         try {
             const newRegister = request.body;
+            newRegister["path_image"] = request.file.filename;
             this.isValidDatas(newRegister);
             await this.service.create(newRegister);
             return response.sendStatus(201);

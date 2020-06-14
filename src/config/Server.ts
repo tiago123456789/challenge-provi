@@ -7,6 +7,7 @@ const app = express();
 const cors = require("cors");
 
 
+
 // Setting middleware make parse datas to json.
 app.use(express.json());
 
