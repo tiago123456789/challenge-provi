@@ -15,7 +15,7 @@ class StepRepository implements StepRepositoryInterface {
         this.table = "steps";
     }
 
-    async findByFiled(field: string): Promise<any> {
+    async findByField(field: string): Promise<any> {
         const connection = await this.connection;
         return connection.collection(this.table).findOne({ field: field });
     }

@@ -6,6 +6,7 @@ import FactoryInterface from "./contracts/FactoryInterface";
 import StepRepositoryFactory from "./StepRepositoryFactory";
 import UserRepositoryFactory from "./UserRepositoryFactory";
 import ValidatorFactory from "./ValidatorFactory";
+import cache from "../utils/Cache";
 
 class UserServiceFactory implements FactoryInterface<UserService> {
 
@@ -18,7 +19,8 @@ class UserServiceFactory implements FactoryInterface<UserService> {
             new Encrypter(),
             repository,
             stepRepository,
-            validatorFactory
+            validatorFactory,
+            cache
         );
     }
 

@@ -4,6 +4,7 @@ import FactoryInterface from "../factories/contracts/FactoryInterface";
 import FieldUpdate from "../models/FieldUpdate";
 import StepRepositoryInterface from "../repositories/contracts/StepRepositoryInterface";
 import UserRepositoryInterface from "../repositories/contracts/UserRepositoryInterface";
+import { CacheInterface } from "../utils/Cache";
 import Encrypter from "../utils/Encrypter";
 import Uuid from "../utils/Uuid";
 import ValidatorInterface from "../validations/contracts/ValidatorInterface";
@@ -15,14 +16,15 @@ class UserService {
         private readonly encrypterUtil: Encrypter,
         private readonly repository: UserRepositoryInterface,
         private readonly stepRepository: StepRepositoryInterface,
-        private readonly validatorFactory: FactoryInterface<ValidatorInterface>
-    ) {}
+        private readonly validatorFactory: FactoryInterface<ValidatorInterface>,
+        private readonly cache: CacheInterface
+    ) { }
 
     public findByToken(token: string): Promise<any> {
         return this.repository.findByToken(token);
     }
-        
-    public async register(register: { [key:string]: any }) {
+
+    public async register(register: { [key: string]: any }) {
         const userWithEmail = await this.repository.findByEmail(register.email);
         const isExistUserWithEmail: boolean = userWithEmail.length > 0;
         if (isExistUserWithEmail) {
@@ -37,40 +39,112 @@ class UserService {
     }
 
     public async updateField(fieldUpdate: FieldUpdate) {
-        const step = await this.stepRepository.findByFiled(fieldUpdate.field);
+        const step = await this.stepRepository.findByField(fieldUpdate.field);
 
         if (!step) {
             throw new InvalidDatasException(JSON.stringify(["You trying update field invalid."]));
         }
 
+        let userByToken = await this.repository.findByToken(fieldUpdate.token);
+        userByToken = userByToken[0];
+
+         // @ts-ignore 
+         if (!userByToken.nextStep) {
+            return null;
+        }
+
+        const fieldsUpdated: any[] = await this.cache.smembers(`${fieldUpdate.token}_fields_updated`);
+        const isFieldUpdateUnorder = (
+            // @ts-ignorex
+            fieldUpdate.field != userByToken.nextStep && 
+            fieldsUpdated.indexOf(fieldUpdate.field) == -1
+        )
+
+
+        if (isFieldUpdateUnorder) {
+            // @ts-ignore
+            throw new BusinesssException(`Please must order field updation. Then next field is ${userByToken.nextStep}`);
+        }
+
+
+       
         if (step.validation) {
-            this.validatorFactory
+            await this.validatorFactory
                 .make({ validation: step.validation })
                 .validate(fieldUpdate.data);
         }
 
-        let userByToken = await this.repository.findByToken(fieldUpdate.token);
-        userByToken = userByToken[0];
+        const nextStep = await this.stepRepository.getNextStep(step);
+        const field = nextStep != null ? nextStep.field : null;
 
         // @ts-ignore
-        if (!userByToken.nextStep) {
-            return null;
+        const registersWithDatasMencionated = await this.repository.findByFieldAnIdDifferenteMencionated(fieldUpdate, userByToken._id)
+        const isDatasAlreadyUsed = registersWithDatasMencionated.length > 0;
+        if (isDatasAlreadyUsed) {
+            throw new BusinesssException("The value is already used.");
+        }
+
+        const isStepAddress = fieldUpdate.field == 'address';
+        if (isStepAddress) {
+            // @ts-ignorex
+            let address = await this.cache.get(fieldUpdate.data);
+            address = JSON.parse(address);
+            fieldUpdate.data = address;
         }
 
         // @ts-ignore
         const isFieldUpdateCorrect = fieldUpdate.field == userByToken.nextStep;
         if (!isFieldUpdateCorrect) {
             // @ts-ignore
-            throw new BusinesssException(`The field that you are trying update no correct! The field correct is ${userByToken.nextStep}`);
+            const registers = await this.repository.findByFieldAnId(fieldUpdate, userByToken._id);
+            const isExistData = registers.length > 0;
+            if (!isExistData) {
+                await this.repository.update(
+                    { 
+                        token: fieldUpdate.token
+                    },
+                    { 
+                        $push: {
+                            [fieldUpdate.field]: {
+                                data: fieldUpdate.data,
+                                updatedAt: new Date()
+                            }
+                        }
+                    }
+                );
+                return field;
+            }
+
+            await this.repository.update(
+                {
+                    token: fieldUpdate.token,
+                    [fieldUpdate.field]: {
+                        $elemMatch: { data: fieldUpdate.data }
+                    }
+                },
+                {
+                    $set: {
+                        [`${fieldUpdate.field}.$.updatedAt`]: new Date() 
+                    }
+                }
+            );
+            return field;
         }
 
-        const nextStep = await this.stepRepository.getNextStep(step);
-
-        const field = nextStep != null ? nextStep.field : null;
         await this.repository.update(
-            { token: fieldUpdate.token }, 
-            { $set: { nextStep: field } }
-        );  
+            { token: fieldUpdate.token },
+            {
+                $set: {
+                    nextStep: field,
+                    [fieldUpdate.field]: [
+                        { data: fieldUpdate.data, updatedAt: new Date() }
+                    ]
+                }
+            }
+        );
+
+
+        await this.cache.sadd(`${fieldUpdate.token}_fields_updated`, [...fieldsUpdated, fieldUpdate.field], 900)
 
 
         return field;

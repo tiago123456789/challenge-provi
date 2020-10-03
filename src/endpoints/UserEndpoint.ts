@@ -31,10 +31,10 @@ class UserEndpoint extends Endpoint {
 
     async updateField(request: Request, response: Response, next: NextFunction) {
         try {
-            const fieldUpdate = request.params.field;
+            const field = request.params.nextStep
             const datas = request.body;
             const nextStep = await this.service.updateField({
-                field: fieldUpdate, token: datas.token, data: datas.data
+                field: field, token: datas.token, data: datas.data
             });
             return response.status(201).json({
                 success: true,

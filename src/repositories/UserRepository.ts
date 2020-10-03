@@ -1,6 +1,7 @@
 import UserRepositoryInterface from "./contracts/UserRepositoryInterface";
-import mongo from "mongodb";
+import mongo, { ObjectId } from "mongodb";
 import connection from "../config/Database";
+import FieldUpdate from "../models/FieldUpdate";
 
 class UserRepository implements UserRepositoryInterface {
 
@@ -24,17 +25,17 @@ class UserRepository implements UserRepositoryInterface {
     async findByEmail(email: string): Promise<any> {
         const connection = await this.connection;
         return connection
-                .collection(this.table)
-                .find({ email: email })
-                .toArray();
+            .collection(this.table)
+            .find({ email: email })
+            .toArray();
     }
 
-    async findByToken(token: string): Promise<any[]>  {
+    async findByToken(token: string): Promise<any[]> {
         const connection = await this.connection;
         return connection
-                .collection(this.table)
-                .find({ token: token })
-                .toArray();
+            .collection(this.table)
+            .find({ token: token })
+            .toArray();
     }
 
     async update(
@@ -43,8 +44,34 @@ class UserRepository implements UserRepositoryInterface {
     ): Promise<any> {
         const connection = await this.connection;
         return connection
-                .collection(this.table)
-                .updateOne(conditions, datasModified);
+            .collection(this.table)
+            .updateOne(conditions, datasModified);
+    }
+
+    async findByFieldAnIdDifferenteMencionated(field: FieldUpdate, id: string): Promise<any> {
+        const connection = await this.connection;
+        return connection
+            .collection(this.table)
+            .find({
+                _id: { $ne: new ObjectId(id) },
+                [field.field]: {
+                    $elemMatch: { data: field.data }
+                }
+            })
+            .toArray();
+    }
+
+    async findByFieldAnId(field: FieldUpdate, id: string): Promise<any> {
+        const connection = await this.connection;
+        return connection
+            .collection(this.table)
+            .find({
+                _id: new ObjectId(id),
+                [field.field]: {
+                    $elemMatch: { data: field.data }
+                }
+            })
+            .toArray();
     }
 }
 

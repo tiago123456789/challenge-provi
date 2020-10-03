@@ -1,6 +1,6 @@
 interface StepRepositoryInterface {
 
-    findByFiled(field: string): Promise<any>;
+    findByField(field: string): Promise<any>;
     getFirstStep(): Promise<any>;
     getNextStep(stepCurrent: { [key: string]: any }): Promise<any>;
 }

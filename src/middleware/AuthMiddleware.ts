@@ -9,6 +9,7 @@ export default {
         try {
             const data = request.body;
             await auth.hasPermission({ token: data.token });
+            next();
         } catch (error) {
             next(error);
         }
