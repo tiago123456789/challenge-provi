@@ -8,6 +8,7 @@ class UserEndpoint extends Endpoint {
     constructor(private readonly service: UserService) {
         super();
         this.register = this.register.bind(this);
+        this.updateField = this.updateField.bind(this);
     }
 
     getRulesValidation(): { [key: string]: any; } {
@@ -20,8 +21,25 @@ class UserEndpoint extends Endpoint {
     public async register(request: Request, response: Response, next: NextFunction) {
         try {
             const register = request.body;
+            this.isValidDatas(register);
             const token = await this.service.register(register);
             return response.json({ token });
+        } catch(error) {
+            next(error);
+        }
+    }
+
+    async updateField(request: Request, response: Response, next: NextFunction) {
+        try {
+            const fieldUpdate = request.params.field;
+            const datas = request.body;
+            const nextStep = await this.service.updateField({
+                field: fieldUpdate, token: datas.token, data: datas.data
+            });
+            return response.status(201).json({
+                success: true,
+                next_end_point: nextStep
+            });
         } catch(error) {
             next(error);
         }

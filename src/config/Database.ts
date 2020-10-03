@@ -3,10 +3,11 @@ import mongo from "mongodb";
 const mongoClient = mongo.MongoClient;
 let connection: mongo.Db | null = null;
 
-(async () => {
+export default (async () => {
     if (connection) {
-        return;
+        return connection;
     }
+
     connection = await new Promise((resolve, reject) => {
         // @ts-ignore
         mongoClient.connect(process.env.DB_URL, (error, client) => {
@@ -17,6 +18,6 @@ let connection: mongo.Db | null = null;
             }
         });
     });
-})();
 
-export default connection; 
+    return connection;
+})();

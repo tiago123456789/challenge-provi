@@ -2,10 +2,15 @@ import { NextFunction, Response, Request } from "express";
 
 export default (error: Error, request: Request, response: Response, next: NextFunction) => {
 
-    switch(error.name) {
+    switch (error.name) {
         case "NotFoundException":
             return response.status(404).json({
                 statusCode: 404,
+                message: error.message
+            });
+        case "BusinessLogicException":
+            return response.status(409).json({
+                statusCode: 409,
                 message: error.message
             });
         case "InvalidDatasException":
@@ -13,7 +18,8 @@ export default (error: Error, request: Request, response: Response, next: NextFu
                 statusCode: 400,
                 message: JSON.parse(error.message)
             });
-        default: 
+        default:
+            console.log(error);
             return response.status(500).json({
                 statusCode: 500,
                 message: error.message
