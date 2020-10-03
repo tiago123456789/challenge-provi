@@ -17,6 +17,10 @@ class UserService {
         private readonly stepRepository: StepRepositoryInterface,
         private readonly validatorFactory: FactoryInterface<ValidatorInterface>
     ) {}
+
+    public findByToken(token: string): Promise<any> {
+        return this.repository.findByToken(token);
+    }
         
     public async register(register: { [key:string]: any }) {
         const userWithEmail = await this.repository.findByEmail(register.email);

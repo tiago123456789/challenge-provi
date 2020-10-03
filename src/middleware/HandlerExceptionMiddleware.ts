@@ -18,6 +18,11 @@ export default (error: Error, request: Request, response: Response, next: NextFu
                 statusCode: 400,
                 message: JSON.parse(error.message)
             });
+        case "ForbiddenException":
+            return response.status(403).json({
+                statusCode: 403,
+                message: error.message
+            });
         default:
             console.log(error);
             return response.status(500).json({
