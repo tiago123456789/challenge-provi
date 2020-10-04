@@ -1,3 +1,5 @@
+import { Logger } from "winston";
+import logger from "../config/Logger";
 import BusinesssException from "../exceptions/BusinessLogicException";
 import InvalidDatasException from "../exceptions/InvalidDatasException";
 import FactoryInterface from "../factories/contracts/FactoryInterface";
@@ -17,7 +19,8 @@ class UserService {
         private readonly repository: UserRepositoryInterface,
         private readonly stepRepository: StepRepositoryInterface,
         private readonly validatorFactory: FactoryInterface<ValidatorInterface>,
-        private readonly cache: CacheInterface
+        private readonly cache: CacheInterface,
+        private readonly logger: Logger
     ) { }
 
     public findByToken(token: string): Promise<any> {
@@ -31,6 +34,7 @@ class UserService {
             throw new BusinesssException("Use another email!");
         }
 
+        this.logger.info(`Creating new user with email: ${register.email}`)
         const step = await this.stepRepository.getFirstStep();
         register.password = await this.encrypterUtil.getHash(register.password);
         register.token = await this.uuidUtil.get();
@@ -47,11 +51,6 @@ class UserService {
 
         let userByToken = await this.repository.findByToken(fieldUpdate.token);
         userByToken = userByToken[0];
-
-        //  // @ts-ignore 
-        //  if (!userByToken.nextStep) {
-        //     return null;
-        // }
 
         const fieldsUpdated: any[] = await this.cache.smembers(`${fieldUpdate.token}_fields_updated`);
         this.isFieldUpdateUnOrder(fieldsUpdated, fieldUpdate, userByToken);
@@ -82,6 +81,8 @@ class UserService {
             const registers = await this.repository.findByFieldAnId(fieldUpdate, userByToken._id);
             const isExistData = registers.length > 0;
             if (!isExistData) {
+                // @ts-ignore
+                logger.info(`Updatation data in ${fieldUpdate.field} to user ${userByToken._id}`);
                 await this.repository.update(
                     { 
                         token: fieldUpdate.token
@@ -98,6 +99,8 @@ class UserService {
                 return field;
             }
 
+            // @ts-ignore
+            logger.info(`Additing data in ${fieldUpdate.field} to user ${userByToken._id}`);
             await this.repository.update(
                 {
                     token: fieldUpdate.token,
@@ -114,6 +117,8 @@ class UserService {
             return field;
         }
 
+        // @ts-ignore
+        logger.info(`Additing information about ${fieldUpdate.field} to user ${userByToken._id}`);
         await this.repository.update(
             { token: fieldUpdate.token },
             {
@@ -150,6 +155,8 @@ class UserService {
         const registersWithDatasMencionated = await this.repository.findByFieldAnIdDifferenteMencionated(fieldUpdate, userByToken._id)
         const isDatasAlreadyUsed = registersWithDatasMencionated.length > 0;
         if (isDatasAlreadyUsed) {
+            // @ts-ignore
+            logger.info(`Data in ${fieldUpdate.field} already used per ${userByToken._id}`);
             throw new BusinesssException("The value is already used.");
         }
     }

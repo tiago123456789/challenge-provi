@@ -7,6 +7,7 @@ import StepRepositoryFactory from "./StepRepositoryFactory";
 import UserRepositoryFactory from "./UserRepositoryFactory";
 import ValidatorFactory from "./ValidatorFactory";
 import cache from "../utils/Cache";
+import logger from "../config/Logger";
 
 class UserServiceFactory implements FactoryInterface<UserService> {
 
@@ -20,7 +21,8 @@ class UserServiceFactory implements FactoryInterface<UserService> {
             repository,
             stepRepository,
             validatorFactory,
-            cache
+            cache,
+            logger
         );
     }
 
