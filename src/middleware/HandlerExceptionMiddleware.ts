@@ -29,7 +29,7 @@ export default (error: Error, request: Request, response: Response, next: NextFu
                 message: error.message
             });
         default:
-            logger.error(error);
+            logger.error(error.message);
             return response.status(500).json({
                 statusCode: 500,
                 message: error.message

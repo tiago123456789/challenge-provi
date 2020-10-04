@@ -146,7 +146,7 @@ class UserService {
 
         if (isFieldUpdateUnorder) {
             // @ts-ignore
-            throw new BusinesssException(`Please must order field updation. Then next field is ${userByToken.nextStep}`);
+            throw new BusinessLogicException(`Please must order field updation. Then next field is ${userByToken.nextStep}`);
         }
     }
 

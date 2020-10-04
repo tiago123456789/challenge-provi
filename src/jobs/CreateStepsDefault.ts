@@ -26,4 +26,5 @@ import connection from "../config/Database";
         { field: "amount-requested", createdAt: new Date(), validation: "" }
     );
     console.log("Finished creation steps.");
+    process.exit(0);
 })()

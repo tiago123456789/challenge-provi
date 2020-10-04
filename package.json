@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "npm run build && pm2 start ./build/index.js",
+    "job:create-steps": "npm run build && NODE_ENV=testing node ./build/src/jobs/CreateStepsDefault.js",
+    "start": "npm run build && pm2 start ./build/src/index.js",
     "start:dev": "node_modules/.bin/nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts",
-    "test": "jest"
+    "test": "NODE_ENV=testing jest"
   },
   "keywords": [],
   "author": "",
