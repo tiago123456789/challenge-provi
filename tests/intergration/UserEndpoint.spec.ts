@@ -132,7 +132,7 @@ describe("Integration tests endpoint /api/v1/users", () => {
             .expect(409, done);
     });
 
-    it("POST /api/v1/users/cpf return statusCode 409 due update data duplicate", async (done) => {
+    it("POST /api/v1/users/cpf return statusCode 409 due unorder update data", async (done) => {
         const userRepository = new UserRepositoryFactory().make({});
         await userRepository.save(
             {
@@ -149,6 +149,25 @@ describe("Integration tests endpoint /api/v1/users", () => {
                 "data" : "500.150.920-38",
             })
             .expect(409, done);
+    });
+
+    it("POST /api/v1/users/cpf return statusCode 201", async (done) => {
+        const userRepository = new UserRepositoryFactory().make({});
+        await userRepository.save(
+            {
+                "email" : "test@gmail.com",
+                "password" : "123456789",
+                "token" : "ca88cc54-8d87-43c7-a673-b3813f7959aa",
+                "nextStep" : "cpf"
+            }
+        );
+        request(app)
+            .post('/api/v1/users/cpf')
+            .send(  {
+                "token" : "ca88cc54-8d87-43c7-a673-b3813f7959aa",
+                "data" : "500.150.920-38",
+            })
+            .expect(201, done);
     });
 
     it("POST /api/v1/users/cpf return statusCode 409 due update data duplicate", async (done) => {
