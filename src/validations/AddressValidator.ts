@@ -16,7 +16,6 @@ class AddressValidator implements ValidatorInterface {
     async validate(cep: string) {
         try {
             let cepInCache = await this.cache.get(cep);
-            cepInCache = JSON.parse(cepInCache);
             if (cepInCache) {
                 return cepInCache;
             }

@@ -48,25 +48,13 @@ class UserService {
         let userByToken = await this.repository.findByToken(fieldUpdate.token);
         userByToken = userByToken[0];
 
-         // @ts-ignore 
-         if (!userByToken.nextStep) {
-            return null;
-        }
+        //  // @ts-ignore 
+        //  if (!userByToken.nextStep) {
+        //     return null;
+        // }
 
         const fieldsUpdated: any[] = await this.cache.smembers(`${fieldUpdate.token}_fields_updated`);
-        const isFieldUpdateUnorder = (
-            // @ts-ignorex
-            fieldUpdate.field != userByToken.nextStep && 
-            fieldsUpdated.indexOf(fieldUpdate.field) == -1
-        )
-
-
-        if (isFieldUpdateUnorder) {
-            // @ts-ignore
-            throw new BusinesssException(`Please must order field updation. Then next field is ${userByToken.nextStep}`);
-        }
-
-
+        this.isFieldUpdateUnOrder(fieldsUpdated, fieldUpdate, userByToken);
        
         if (step.validation) {
             await this.validatorFactory
@@ -75,14 +63,8 @@ class UserService {
         }
 
         const nextStep = await this.stepRepository.getNextStep(step);
-        const field = nextStep != null ? nextStep.field : null;
-
-        // @ts-ignore
-        const registersWithDatasMencionated = await this.repository.findByFieldAnIdDifferenteMencionated(fieldUpdate, userByToken._id)
-        const isDatasAlreadyUsed = registersWithDatasMencionated.length > 0;
-        if (isDatasAlreadyUsed) {
-            throw new BusinesssException("The value is already used.");
-        }
+        let field = nextStep != null ? nextStep.field : null;
+        await this.isValueAlreadyUsedAnotherUser(fieldUpdate, userByToken);
 
         const isStepAddress = fieldUpdate.field == 'address';
         if (isStepAddress) {
@@ -91,7 +73,8 @@ class UserService {
             address = JSON.parse(address);
             fieldUpdate.data = address;
         }
-
+        
+    
         // @ts-ignore
         const isFieldUpdateCorrect = fieldUpdate.field == userByToken.nextStep;
         if (!isFieldUpdateCorrect) {
@@ -143,11 +126,32 @@ class UserService {
             }
         );
 
-
-        await this.cache.sadd(`${fieldUpdate.token}_fields_updated`, [...fieldsUpdated, fieldUpdate.field], 900)
-
+        await this.cache.sadd(`${fieldUpdate.token}_fields_updated`, [...fieldsUpdated, fieldUpdate.field], 86400)
 
         return field;
+    }
+
+
+    private isFieldUpdateUnOrder(fieldsUpdated: any[], fieldUpdate: FieldUpdate, userByToken: { [key: string]: any }) {
+        const isFieldUpdateUnorder = (
+            // @ts-ignorex
+            fieldUpdate.field != userByToken.nextStep && 
+            fieldsUpdated.indexOf(fieldUpdate.field) == -1
+        )
+
+        if (isFieldUpdateUnorder) {
+            // @ts-ignore
+            throw new BusinesssException(`Please must order field updation. Then next field is ${userByToken.nextStep}`);
+        }
+    }
+
+    private async isValueAlreadyUsedAnotherUser(fieldUpdate: FieldUpdate, userByToken: { [key: string]: any }) {
+        // @ts-ignore
+        const registersWithDatasMencionated = await this.repository.findByFieldAnIdDifferenteMencionated(fieldUpdate, userByToken._id)
+        const isDatasAlreadyUsed = registersWithDatasMencionated.length > 0;
+        if (isDatasAlreadyUsed) {
+            throw new BusinesssException("The value is already used.");
+        }
     }
 }
 
