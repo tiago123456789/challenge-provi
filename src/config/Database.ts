@@ -7,7 +7,7 @@ export default (async () => {
     if (connection) {
         return connection;
     }
-
+    
     connection = await new Promise((resolve, reject) => {
         // @ts-ignore
         mongoClient.connect(process.env.DB_URL, (error, client) => {

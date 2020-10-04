@@ -1,6 +1,6 @@
 import { Logger } from "winston";
 import logger from "../config/Logger";
-import BusinesssException from "../exceptions/BusinessLogicException";
+import BusinessLogicException from "../exceptions/BusinessLogicException";
 import InvalidDatasException from "../exceptions/InvalidDatasException";
 import FactoryInterface from "../factories/contracts/FactoryInterface";
 import FieldUpdate from "../models/FieldUpdate";
@@ -31,7 +31,7 @@ class UserService {
         const userWithEmail = await this.repository.findByEmail(register.email);
         const isExistUserWithEmail: boolean = userWithEmail.length > 0;
         if (isExistUserWithEmail) {
-            throw new BusinesssException("Use another email!");
+            throw new BusinessLogicException("Use another email!");
         }
 
         this.logger.info(`Creating new user with email: ${register.email}`)
@@ -54,7 +54,7 @@ class UserService {
 
         const fieldsUpdated: any[] = await this.cache.smembers(`${fieldUpdate.token}_fields_updated`);
         this.isFieldUpdateUnOrder(fieldsUpdated, fieldUpdate, userByToken);
-       
+
         if (step.validation) {
             await this.validatorFactory
                 .make({ validation: step.validation })
@@ -157,7 +157,7 @@ class UserService {
         if (isDatasAlreadyUsed) {
             // @ts-ignore
             logger.info(`Data in ${fieldUpdate.field} already used per ${userByToken._id}`);
-            throw new BusinesssException("The value is already used.");
+            throw new BusinessLogicException("The value is already used.");
         }
     }
 }
