@@ -9,6 +9,5 @@ const getPathDotenv = () => {
     return ".env";
 }
 
-console.log(getPathDotenv());
 // Loading environment variables
 dotenv.config({ path: getPathDotenv() });
