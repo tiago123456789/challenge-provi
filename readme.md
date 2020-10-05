@@ -45,6 +45,7 @@ Configurações para rodar os testes:
 OBSERVAÇÕES:
 ============
 
+- Na raiz do projeto existe um arquivo chamando *Application architecture challenge provi.jpg* que definir a arquitetura da aplicação e os componentes necessário que identifiquei que seriam necessários para o desafio.
 - Na raiz do projeto existe um arquivo chamado *provi_challenge.postman_collection.json* que deve ser importado no postman. Ele contém as rotas da aplicação.
 - Existem duas rotas:
     - /api/v1/users para criar um usuário
