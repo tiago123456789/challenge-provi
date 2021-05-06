@@ -28,3 +28,10 @@ jobs:
     - run: npm install
     - run: docker-compose up -d
     - run: npm run job:create-steps
+    - run: |
+        echo "ENV=dev" >> .env
+        echo "PORT=3000"  >> .env
+        echo "DB_URL=mongodb://localhost:27017"  >> .env
+        echo "DB_DATABASE=teste"  >> .env
+        echo "API_VIACEP="  >> .env
+        echo "REDIS_URL=redis://localhost" >> .env
