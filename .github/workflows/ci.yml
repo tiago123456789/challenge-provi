@@ -35,3 +35,4 @@ jobs:
         echo "DB_DATABASE=teste"  >> .env
         echo "API_VIACEP="  >> .env
         echo "REDIS_URL=redis://localhost" >> .env
+    - run: npm run test
