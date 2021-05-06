@@ -27,13 +27,14 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm install
     - run: docker-compose up -d
-    - run: |
-        echo ENV=dev >> .env
-        echo PORT=3000  >> .env
-        echo DB_URL=mongodb://localhost:27017"  >> .env
-        echo DB_DATABASE=teste  >> .env
-        echo API_VIACEP=  >> .env
-        echo REDIS_URL=redis://localhost >> .env
+    - uses: SpicyPizza/create-envfile@v1
+      with:
+        envkey_ENV: "dev"
+        envkey_PORT: 3000
+        envkey_DB_URL: "mongodb://127.0.0.1:27017"
+        envkey_API_VIACEP: ""
+        envkey_REDIS_URL: "redis://localhost"
+        file_name: .env
     - run: npm run job:create-steps
     - run: npm run test
     - name: Send mail
