@@ -27,7 +27,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm install
     - run: docker-compose up -d
-    - run: npm run job:create-steps
+   
     - run: |
         echo "ENV=dev" >> .env
         echo "PORT=3000"  >> .env
@@ -35,6 +35,7 @@ jobs:
         echo "DB_DATABASE=teste"  >> .env
         echo "API_VIACEP="  >> .env
         echo "REDIS_URL=redis://localhost" >> .env
+    - run: npm run job:create-steps
     - run: npm run test
     - name: Send mail
       if: always()
