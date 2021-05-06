@@ -36,3 +36,21 @@ jobs:
         echo "API_VIACEP="  >> .env
         echo "REDIS_URL=redis://localhost" >> .env
     - run: npm run test
+    - name: Send mail
+      if: always()
+      uses: dawidd6/action-send-mail@v2
+      with:
+        # mail server settings
+        server_address: smtp.mailtrap.io
+        server_port: 2525
+        # user credentials
+        username: 1a6a3b83aecf2b
+        password: 5854ccc5617e81
+        # email subject
+        subject: ${{ github.job }} job of ${{ github.repository }} has ${{ job.status }}
+        # email body as text
+        body: ${{ github.job }} job in worflow ${{ github.workflow }} of ${{ github.repository }} has ${{ job.status }}
+        # comma-separated string, send email to
+        to: tiagorosadacost@gmail.com
+        # from email name
+        from: Github actions
