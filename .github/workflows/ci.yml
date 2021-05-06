@@ -27,7 +27,6 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm install
     - run: docker-compose up -d
-   
     - run: |
         echo "ENV=dev" >> .env
         echo "PORT=3000"  >> .env
