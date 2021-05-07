@@ -49,6 +49,6 @@ jobs:
     - name: send message
       uses: appleboy/discord-action@master
       with:
-        webhook_id: 840023642867105813
-        webhook_token: h0ntJCEQtKQMy08O4h4EHvA8LPS8ry8jT6hhimt8Yia2l6tVmoDzJXKWraq3vHv0u_jK
-        message: The ${{ github.event_name }} event triggered first step.
+        webhook_id: "840023642867105813"
+        webhook_token: "h0ntJCEQtKQMy08O4h4EHvA8LPS8ry8jT6hhimt8Yia2l6tVmoDzJXKWraq3vHv0u_jK"
+        message: The ${{ github.event_name }} job processed.
