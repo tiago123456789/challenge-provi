@@ -51,4 +51,4 @@ jobs:
       with:
         webhook_id: "840023642867105813"
         webhook_token: "h0ntJCEQtKQMy08O4h4EHvA8LPS8ry8jT6hhimt8Yia2l6tVmoDzJXKWraq3vHv0u_jK"
-        message: The pipeline executed  ${{ job.status }}.
+        message: The pipeline executed ${{ job.status }}.
